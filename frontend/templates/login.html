@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — TravelBrain AI</title>
+    <link class="stylesheet" rel="stylesheet" href="/static/css/styles.css?v=2" />
+    <style>
+        /* Scope styles for login portal */
+        .login-container {
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 20px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            z-index: 100;
+        }
+
+        .login-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-brand-ico {
+            display: grid;
+            place-items: center;
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-subtle));
+            border-radius: var(--radius-md);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+        }
+
+        .login-brand-ico svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .login-brand-name {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-top: 4px;
+        }
+
+        .login-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--border-neutral);
+            padding: 4px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+
+        .login-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-soft);
+            padding: 8px 12px;
+            font-size: 13.5px;
+            font-weight: 550;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .login-tab.active {
+            background: var(--surface-solid);
+            color: var(--text);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-soft);
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text);
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrap input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.15);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-alert {
+            padding: 12px;
+            background: rgba(225, 29, 72, 0.1);
+            border: 1px solid rgba(225, 29, 72, 0.25);
+            color: var(--rose);
+            font-size: 13px;
+            border-radius: var(--radius-md);
+            display: none;
+        }
+
+        .toast-success {
+            padding: 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #10b981;
+            font-size: 13px;
+            border-radius: var(--radius-md);
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ambient background -->
+    <div class="aurora" aria-hidden="true">
+        <span class="blob blob-1"></span>
+        <span class="blob blob-2"></span>
+        <span class="blob blob-3"></span>
+        <span class="grid"></span>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+
+            <div class="login-brand">
+                <div class="login-brand-ico">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="m22 2-7 20-4-9-9-4Z" />
+                        <path d="M22 2 11 13" />
+                    </svg>
+                </div>
+                <div class="login-brand-name">TravelBrain AI</div>
+            </div>
+
+            <div class="login-tabs">
+                <button class="login-tab active" id="tabLogin" type="button">Sign In</button>
+                <button class="login-tab" id="tabRegister" type="button">Register</button>
+            </div>
+
+            <div class="login-alert" id="authAlert"></div>
+            <div class="toast-success" id="authSuccess"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm" autocomplete="on">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <div class="input-wrap">
+                        <input type="email" id="loginEmail" placeholder="you@example.com" required
+                            autocomplete="username" />
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="loginPassword" placeholder="••••••••" required
+                            autocomplete="current-password" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary login-btn">
+                    <span>Sign In</span>
+                    <span class="spinner" id="loginSpinner" style="display: none;" aria-hidden="true"></span>
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display: none;" autocomplete="off">
+                <div class="form-group">
+                    <label for="regEmail">Email Address</label>
+                    <div class="input-wrap">
+                        <input type="email" id="regEmail" placeholder="you@example.com" required autocomplete="email" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="regPassword" placeholder="Minimum 6 characters" required
+                            autocomplete="new-password" />
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label for="regConfirm">Confirm Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="regConfirm" placeholder="••••••••" required autocomplete="off" />
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary login-btn">
+                    <span>Create Account</span>
+                    <span class="spinner" id="regSpinner" style="display: none;" aria-hidden="true"></span>
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        // Tab switching logic
+        var tabLogin = document.getElementById("tabLogin");
+        var tabRegister = document.getElementById("tabRegister");
+        var loginForm = document.getElementById("loginForm");
+        var registerForm = document.getElementById("registerForm");
+        var authAlert = document.getElementById("authAlert");
+        var authSuccess = document.getElementById("authSuccess");
+
+        function clearStatus() {
+            authAlert.style.display = "none";
+            authAlert.innerText = "";
+            authSuccess.style.display = "none";
+            authSuccess.innerText = "";
+        }
+
+        tabLogin.addEventListener("click", function () {
+            tabLogin.classList.add("active");
+            tabRegister.classList.remove("active");
+            loginForm.style.display = "block";
+            registerForm.style.display = "none";
+            clearStatus();
+        });
+
+        tabRegister.addEventListener("click", function () {
+            tabRegister.classList.add("active");
+            tabLogin.classList.remove("active");
+            loginForm.style.display = "none";
+            registerForm.style.display = "block";
+            clearStatus();
+        });
+
+        // Submit Sign In
+        loginForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            clearStatus();
+
+            var email = document.getElementById("loginEmail").value;
+            var password = document.getElementById("loginPassword").value;
+            var spinner = document.getElementById("loginSpinner");
+
+            spinner.style.display = "inline-block";
+
+            fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: email, password: password })
+            })
+                .then(function (res) {
+                    return res.json().then(function (data) {
+                        if (!res.ok) {
+                            throw new Error(data.error || "Login failed");
+                        }
+                        return data;
+                    });
+                })
+                .then(function (data) {
+                    window.location.href = "/";
+                })
+                .catch(function (err) {
+                    authAlert.innerText = err.message;
+                    authAlert.style.display = "block";
+                    spinner.style.display = "none";
+                });
+        });
+
+        // Submit Registration
+        registerForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            clearStatus();
+
+            var email = document.getElementById("regEmail").value;
+            var password = document.getElementById("regPassword").value;
+            var confirm = document.getElementById("regConfirm").value;
+            var spinner = document.getElementById("regSpinner");
+
+            if (password.length < 6) {
+                authAlert.innerText = "Password must be at least 6 characters long.";
+                authAlert.style.display = "block";
+                return;
+            }
+
+            if (password !== confirm) {
+                authAlert.innerText = "Passwords do not match.";
+                authAlert.style.display = "block";
+                return;
+            }
+
+            spinner.style.display = "inline-block";
+
+            fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: email, password: password })
+            })
+                .then(function (res) {
+                    return res.json().then(function (data) {
+                        if (!res.ok) {
+                            throw new Error(data.error || "Registration failed");
+                        }
+                        return data;
+                    });
+                })
+                .then(function (data) {
+                    authSuccess.innerText = "Account created! You can now sign in.";
+                    authSuccess.style.display = "block";
+                    spinner.style.display = "none";
+
+                    // Reset and switch to login tab
+                    registerForm.reset();
+                    setTimeout(function () {
+                        tabLogin.click();
+                        document.getElementById("loginEmail").value = email;
+                        document.getElementById("loginPassword").focus();
+                    }, 1200);
+                })
+                .catch(function (err) {
+                    authAlert.innerText = err.message;
+                    authAlert.style.display = "block";
+                    spinner.style.display = "none";
+                });
+        });
+    </script>
+</body>
+
+</html>
